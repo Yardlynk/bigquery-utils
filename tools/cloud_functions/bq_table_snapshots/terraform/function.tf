@@ -31,6 +31,8 @@ resource "random_id" "bucket_prefix" {
 resource "google_bigquery_dataset" "dataset" {
   project    = var.storage_project_id
   dataset_id = var.target_dataset_name
+  location                    = "europe-west2"
+  default_table_expiration_ms = 7776000000
 }
 
 ##########################################
@@ -90,6 +92,7 @@ resource "google_cloudfunctions_function" "bq_backup_fetch_tables_names" {
   entry_point           = "main"
   source_archive_bucket = google_storage_bucket.bucket.name
   source_archive_object = google_storage_bucket_object.bq_backup_fetch_tables_names.name
+  service_account_email = "bq-data-snapshot@yardlink-data-prod.iam.gserviceaccount.com"
 
   environment_variables = {
     DATA_PROJECT_ID            = var.storage_project_id
@@ -127,6 +130,7 @@ resource "google_cloudfunctions_function" "bq_backup_create_snapshots" {
   entry_point           = "main"
   source_archive_bucket = google_storage_bucket.bucket.name
   source_archive_object = google_storage_bucket_object.bq_backup_create_snapshots.name
+  service_account_email = "bq-data-snapshot@yardlink-data-prod.iam.gserviceaccount.com"
 
   environment_variables = {
     BQ_DATA_PROJECT_ID = var.storage_project_id
