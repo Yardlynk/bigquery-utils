@@ -27,23 +27,18 @@ variable "region" {
   default     = "us-central1"
 }
 
-variable "source_dataset_name" {
-  description = "BigQuery dataset from which table snapshots will be created."
+variable "aws_service_account" {
+  description = "AWS service account email."
   type        = string
 }
 
-variable "target_dataset_name" {
-  description = "BigQuery dataset to which table snapshots will be written."
+variable "aws_location" {
+  description = "AWS Locations"
   type        = string
 }
 
-variable "crontab_format" {
-  description = "Crontab schedule under which the solution will be executed."
-  type        = string
-}
-
-variable "seconds_before_expiration" {
-  description = "Seconds before the snapshot will expire."
+variable "default_table_expiration_ms" {
+  description = "Default Table Expiration ms."
   type        = number
 }
 
@@ -59,3 +54,11 @@ variable "tables_to_exclude_list" {
   default = "[]"
 }
 
+variable "snapshots" {
+    type = list(object({
+        source_dataset_name = string
+        target_dataset_name = string
+        crontab_format = string
+        seconds_before_expiration = number
+    })) 
+}
