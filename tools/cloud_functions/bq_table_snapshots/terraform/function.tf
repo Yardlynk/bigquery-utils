@@ -53,7 +53,8 @@ moved {
 ##########################################
 
 resource "google_storage_bucket" "bucket" {
-  name                        = "${random_id.bucket_prefix.hex}-gcf-source"
+  for_each    = {for idx, val in var.snapshots: idx => val}
+  name                        = "${random_id.bucket_prefix.hex}-${each.value.target_dataset_name}-gcf-source"
   location                    = "US"
   uniform_bucket_level_access = true
 }
@@ -84,7 +85,7 @@ resource "google_cloud_scheduler_job" "job" {
 
   pubsub_target {
     # topic.id is the topic's full resource name.
-    topic_name = google_pubsub_topic.snapshot_dataset_topic[each.key].name
+    topic_name = google_pubsub_topic.snapshot_dataset_topic[each.key].id
     data       = base64encode("{\"source_dataset_name\":\"${each.value.source_dataset_name}\",\"target_dataset_name\":\"${each.value.target_dataset_name}\",\"crontab_format\":\"${each.value.crontab_format}\",\"seconds_before_expiration\":${each.value.seconds_before_expiration},\"tables_to_include_list\":${var.tables_to_include_list},\"tables_to_exclude_list\":${var.tables_to_exclude_list}}")
   }
 }
@@ -96,13 +97,14 @@ data "archive_file" "bq_backup_fetch_tables_names" {
   for_each    = {for idx, val in var.snapshots: idx => val}
   type        = "zip"
   source_dir  = "../bq_backup_fetch_tables_names"
-  output_path = "/tmp/bq_backup_fetch_tables_name_${each.value.target_dataset_name}.zip"
+  output_path = "/tmp/bq_backup_fetch_tables_names_${each.value.target_dataset_name}.zip"
 }
 
 resource "google_storage_bucket_object" "bq_backup_fetch_tables_names" {
   for_each    = {for idx, val in var.snapshots: idx => val}
   name   = "bq_backup_fetch_tables_names_${each.value.target_dataset_name}.zip"
-  bucket = google_storage_bucket.bucket.name
+  # bucket = google_storage_bucket.bucket.name
+  bucket = resource.google_storage_bucket.bucket[each.key].name
   source = data.archive_file.bq_backup_fetch_tables_names[each.key].output_path
 }
 
@@ -113,18 +115,18 @@ resource "google_cloudfunctions_function" "bq_backup_fetch_tables_names" {
   runtime               = "python39"
   available_memory_mb   = 128
   entry_point           = "main"
-  source_archive_bucket = google_storage_bucket.bucket.name
+  source_archive_bucket = resource.google_storage_bucket.bucket[each.key].name
   source_archive_object = google_storage_bucket_object.bq_backup_fetch_tables_names[each.key].name
   service_account_email = var.aws_service_account
   environment_variables = {
     DATA_PROJECT_ID            = var.storage_project_id
     PUBSUB_PROJECT_ID          = var.project_id
-    TABLE_NAME_PUBSUB_TOPIC_ID = "bq_snapshot_create_snapshot_topic_${each.value.target_dataset_name}"
+    TABLE_NAME_PUBSUB_TOPIC_ID = google_pubsub_topic.bq_snapshot_create_snapshot_topic[each.key].name
   }
 
   event_trigger {
     event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
-    resource   = "google_pubsub_topic.snapshot_dataset_topic_${each.value.target_dataset_name}.id"
+    resource   = google_pubsub_topic.snapshot_dataset_topic[each.key].id
   }
 }
 
@@ -134,14 +136,14 @@ resource "google_cloudfunctions_function" "bq_backup_fetch_tables_names" {
 data "archive_file" "bq_backup_create_snapshots" {
   for_each    = {for idx, val in var.snapshots: idx => val}
   type        = "zip"
-  source_dir  = "../bq_backup_fetch_tables_names"
+  source_dir  = "../bq_backup_create_snapshots"
   output_path = "/tmp/bq_backup_create_snapshots_${each.value.target_dataset_name}.zip"
 }
 
 resource "google_storage_bucket_object" "bq_backup_create_snapshots" {
   for_each    = {for idx, val in var.snapshots: idx => val}
   name   = "bq_backup_create_snapshots_${each.value.target_dataset_name}.zip"
-  bucket = google_storage_bucket.bucket.name
+  bucket = google_storage_bucket.bucket[each.key].name
   source = data.archive_file.bq_backup_create_snapshots[each.key].output_path
 }
 
@@ -154,7 +156,7 @@ resource "google_cloudfunctions_function" "bq_backup_create_snapshots" {
   max_instances         = 100 # BQ allows a max of 100 concurrent snapshot jobs per project
   available_memory_mb   = 128
   entry_point           = "main"
-  source_archive_bucket = google_storage_bucket.bucket.name
+  source_archive_bucket = google_storage_bucket.bucket[each.key].name
   source_archive_object = google_storage_bucket_object.bq_backup_create_snapshots[each.key].name 
   service_account_email = var.aws_service_account
 
@@ -165,12 +167,15 @@ resource "google_cloudfunctions_function" "bq_backup_create_snapshots" {
 
   event_trigger {
     event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
-    resource   = "google_pubsub_topic.bq_snapshot_create_snapshot_topic_${each.value.target_dataset_name}.id"
+    resource   = google_pubsub_topic.bq_snapshot_create_snapshot_topic[each.key].id
   }
 }
+
+
+
 
 # output "debug" {
 #   # value = data.archive_file.bq_backup_fetch_tables_names[*][1].output_path
 #   # value = data.archive_file.bq_backup_fetch_tables_names
-#   value = data.archive_file.bq_backup_fetch_tables_names
+#   value = resource.google_storage_bucket.bucket[*][1]
 # }
