@@ -35,6 +35,11 @@ resource "google_bigquery_dataset" "dataset" {
   default_table_expiration_ms = 7776000000
 }
 
+moved {
+  from = google_bigquery_dataset.dataset["0"]
+  to   = google_bigquery_dataset.dataset
+}
+
 ##########################################
 #        GCS Bucket for CF code          #
 ##########################################
