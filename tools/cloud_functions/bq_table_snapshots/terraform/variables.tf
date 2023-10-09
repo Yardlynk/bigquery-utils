@@ -60,5 +60,7 @@ variable "snapshots" {
         target_dataset_name = string
         crontab_format = string
         seconds_before_expiration = number
+        project_id                  = string
+        storage_project_id          = string
     })) 
 }

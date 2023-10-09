@@ -119,8 +119,8 @@ resource "google_cloudfunctions_function" "bq_backup_fetch_tables_names" {
   source_archive_object = google_storage_bucket_object.bq_backup_fetch_tables_names[each.key].name
   service_account_email = var.aws_service_account
   environment_variables = {
-    DATA_PROJECT_ID            = var.storage_project_id
-    PUBSUB_PROJECT_ID          = var.project_id
+    DATA_PROJECT_ID            = each.value.storage_project_id
+    PUBSUB_PROJECT_ID          = each.value.project_id
     TABLE_NAME_PUBSUB_TOPIC_ID = google_pubsub_topic.bq_snapshot_create_snapshot_topic[each.key].name
   }
 
@@ -161,8 +161,8 @@ resource "google_cloudfunctions_function" "bq_backup_create_snapshots" {
   service_account_email = var.aws_service_account
 
   environment_variables = {
-    BQ_DATA_PROJECT_ID = var.storage_project_id
-    BQ_JOBS_PROJECT_ID = var.project_id
+    BQ_DATA_PROJECT_ID = each.value.storage_project_id
+    BQ_JOBS_PROJECT_ID = each.value.project_id
   }
 
   event_trigger {
