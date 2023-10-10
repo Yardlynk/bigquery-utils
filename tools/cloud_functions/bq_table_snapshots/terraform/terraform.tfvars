@@ -3,7 +3,7 @@ snapshots = [
         source_dataset_name       = "oms_raw_public"
         target_dataset_name       = "oms_raw_public_history"
         seconds_before_expiration = 5443200
-        crontab_format            = "0 0 * * 0"
+        crontab_format            = "0 0 * * 1"
         project_id                  = "yardlink-data-prod"
         storage_project_id          = "yardlink-data-prod"
     },
@@ -11,7 +11,7 @@ snapshots = [
         source_dataset_name       = "default"
         target_dataset_name       = "default_history"
         seconds_before_expiration = 5443200
-        crontab_format            = "0 0 * * 0"
+        crontab_format            = "0 0 * * 1"
         project_id                  = "yardlink-data-prod"
         storage_project_id          = "yardlink-data-prod"
     }  
