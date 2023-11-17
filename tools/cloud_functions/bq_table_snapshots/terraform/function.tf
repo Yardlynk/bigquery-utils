@@ -43,10 +43,10 @@ moved {
   to   = google_bigquery_dataset.dataset["0"]
 }
 
-moved {
-  from = google_bigquery_dataset.dataset["0"]
-  to   = google_bigquery_dataset.dataset
-}
+# moved {
+#   from = google_bigquery_dataset.dataset["0"]
+#   to   = google_bigquery_dataset.dataset
+# }
 
 ##########################################
 #        GCS Bucket for CF code          #
