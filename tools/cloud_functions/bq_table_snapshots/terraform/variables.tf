@@ -62,5 +62,7 @@ variable "snapshots" {
         seconds_before_expiration = number
         project_id                  = string
         storage_project_id          = string
+        tables_to_exclude_list = optional(string, "[]")
+        tables_to_include_list = optional(string, "[]")
     })) 
 }

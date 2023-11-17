@@ -86,7 +86,7 @@ resource "google_cloud_scheduler_job" "job" {
   pubsub_target {
     # topic.id is the topic's full resource name.
     topic_name = google_pubsub_topic.snapshot_dataset_topic[each.key].id
-    data       = base64encode("{\"source_dataset_name\":\"${each.value.source_dataset_name}\",\"target_dataset_name\":\"${each.value.target_dataset_name}\",\"crontab_format\":\"${each.value.crontab_format}\",\"seconds_before_expiration\":${each.value.seconds_before_expiration},\"tables_to_include_list\":${var.tables_to_include_list},\"tables_to_exclude_list\":${var.tables_to_exclude_list}}")
+    data       = base64encode("{\"source_dataset_name\":\"${each.value.source_dataset_name}\",\"target_dataset_name\":\"${each.value.target_dataset_name}\",\"crontab_format\":\"${each.value.crontab_format}\",\"seconds_before_expiration\":${each.value.seconds_before_expiration},\"tables_to_include_list\":${each.value.tables_to_include_list},\"tables_to_exclude_list\":${each.value.tables_to_exclude_list}}")
   }
 }
 

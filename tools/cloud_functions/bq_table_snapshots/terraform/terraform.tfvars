@@ -6,6 +6,7 @@ snapshots = [
         crontab_format            = "0 0 * * 1"
         project_id                  = "yardlink-data-prod"
         storage_project_id          = "yardlink-data-prod"
+        tables_to_exclude_list      = "['versions', 'sent_emails']"
     },
     {
         source_dataset_name       = "default"
@@ -19,6 +20,5 @@ snapshots = [
 project_id                  = "yardlink-data-prod"
 aws_service_account         = "bq-data-snapshot@yardlink-data-prod.iam.gserviceaccount.com"
 storage_project_id          = "yardlink-data-prod"
-default_table_expiration_ms = 7776000000
+default_table_expiration_ms = 5443200
 aws_location                = "europe-west2"
-
