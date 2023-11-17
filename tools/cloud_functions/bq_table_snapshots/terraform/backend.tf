@@ -14,7 +14,7 @@
 
 terraform {
   backend "gcs" {
-    bucket = "YOUR_TF_STATE_CLOUD_STORAGE_BUCKET"
+    bucket = "yardlink-terraform"
     prefix = "terraform/state"
   }
 }
