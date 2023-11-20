@@ -6,7 +6,7 @@ snapshots = [
         crontab_format            = "0 0 * * 1"
         project_id                  = "yardlink-data-prod"
         storage_project_id          = "yardlink-data-prod"
-        tables_to_exclude_list      = "['versions', 'sent_emails']"
+        tables_to_exclude_list      = "[\"versions\", \"sent_emails\"]"
     },
     {
         source_dataset_name       = "default"
