@@ -42,17 +42,17 @@ variable "default_table_expiration_ms" {
   type        = number
 }
 
-variable "tables_to_include_list" {
-  description = "List of BigQuery table names to snapshot from the specified source_dataset_name. If this variable is set, only the tables listed will be snapshotted. If not set, all tables within the specified source_dataset_name will be snapshotted."
-  type    = string
-  default = "[]"
-}
+# variable "tables_to_include_list" {
+#   description = "List of BigQuery table names to snapshot from the specified source_dataset_name. If this variable is set, only the tables listed will be snapshotted. If not set, all tables within the specified source_dataset_name will be snapshotted."
+#   type    = string
+#   default = "[]"
+# }
 
-variable "tables_to_exclude_list" {
-  description = "List of BigQuery table names to exclude when snapshotting tables within the specified source_dataset_name. If this variable is set, the tables listed will be skipped and NOT snapshotted."
-  type    = string
-  default = "[]"
-}
+# variable "tables_to_exclude_list" {
+#   description = "List of BigQuery table names to exclude when snapshotting tables within the specified source_dataset_name. If this variable is set, the tables listed will be skipped and NOT snapshotted."
+#   type    = string
+#   default = "[]"
+# }
 
 variable "snapshots" {
     type = list(object({
